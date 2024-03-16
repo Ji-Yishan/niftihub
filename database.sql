@@ -81,6 +81,13 @@ CREATE TABLE `user_setting` (
 
 /*Data for the table `user_setting` */
 
+/*Table structure for table `collection` */
+CREATE TABLE `collection` (
+  `ownerId` int NOT NULL,
+  `did` int NOT NULL,
+  `sellerId` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
