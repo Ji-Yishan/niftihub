@@ -7,7 +7,12 @@ spring:
     username: niftiihub
     password: sdfhh893whfj09ewj0w9j89shfh908q2h89hfSsFESFE684f8es
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  data:
+    redis:
+      host: 8.134.219.139
+      port: 6379
+      database: 0
+      password: sdfhh893whfj09ewj0w9j89shfh908q2h89hfSsFESFE684f8es
 
 #  data:
 #    redis:
