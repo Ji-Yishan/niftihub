@@ -3,11 +3,16 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/niftiihub?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
-    username: root
-    password: 
+    url: jdbc:mysql://8.134.219.139:3306/niftiihub?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    username: niftiihub
+    password: sdfhh893whfj09ewj0w9j89shfh908q2h89hfSsFESFE684f8es
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  data:
+    redis:
+      host: 8.134.219.139
+      port: 6379
+      database: 0
+      password: sdfhh893whfj09ewj0w9j89shfh908q2h89hfSsFESFE684f8es
 
 #  data:
 #    redis:
