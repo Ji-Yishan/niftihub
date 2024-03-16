@@ -11,6 +11,8 @@ public class WebSocketGetHttpSessionConfig extends ServerEndpointConfig.Configur
         //获取HttpSession对象
         HttpSession httpSession = (HttpSession)request.getHttpSession();
         //保存HttpSession对象
+        //这里有空指针问题
         sec.getUserProperties().put(HttpSession.class.getName(),httpSession);
+
     }
 }

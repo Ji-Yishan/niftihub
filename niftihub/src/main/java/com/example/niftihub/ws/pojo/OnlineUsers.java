@@ -10,7 +10,8 @@ public class OnlineUsers {
     public Map<String, Session> getOnlineUser(){
         return onlineUsers;
     }
-    public void addUser(String user,Session session){
+    //添加用户
+    public static void addUser(String user,Session session){
         onlineUsers.put(user,session);
     }
     //去除用户
