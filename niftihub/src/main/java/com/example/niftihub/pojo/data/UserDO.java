@@ -19,8 +19,13 @@ public class UserDO {
     private String profileP;
     private String password;
 
-    public UserDO(String username, String password) {
-        this.username = username;
+    public UserDO(String phone, String password) {
+        this.phone = phone;
         this.password = password;
+    }
+
+    public UserDO(int uid, String phone) {
+        this.uid = uid;
+        this.phone = phone;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.niftihub.pojo.data.before;
+package com.example.niftihub.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,15 +6,12 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author: Isabella
- * @create: 2023-09-23 18:05
+ * @create: 2024-03-17 01:06
  **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ModelDO {
-    private int mid;
+public class LoginDTO {
+    private String token;
     private int uid;
-    private int deci_id;
-    private String model_name;
-
 }

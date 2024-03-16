@@ -15,7 +15,6 @@ public interface DesignMapper {
     DesignDO selectDesignById(int did);
     int updateDesign(DesignDO designDO);
     int deleteDesign(int did);
-    List<DesignDO> selectMyCollection(int uid);
     List<DesignDO> selectDesignByname(String name);
     List<DesignDO> selectAll();
     int addDesign(DesignDO designDO);

@@ -15,7 +15,7 @@ public class UserInfoMapperTest {
     UserMapper userMapper;
     @Test
     public void addUser(){
-        UserDO userDO=new UserDO("test","password");
+        UserDO userDO=new UserDO("13456252","password");
         System.out.println(userMapper.addUser(userDO));
     }
     @Test
@@ -31,5 +31,10 @@ public class UserInfoMapperTest {
     @Test
     public void deleteUser(){
         System.out.println(userMapper.deleteUser(3));
+    }
+    @Test
+    public void login(){
+        UserDO userDO=new UserDO("14141414","password");
+        System.out.println(userMapper.login(userDO));
     }
 }

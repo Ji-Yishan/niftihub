@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.niftihub.dao.CollectionMapper">
+    <!--    -->
+    <insert id="insertCollection" parameterType="com.example.niftihub.pojo.data.CollectionDO">
+        insert into niftiihub.collection (ownerId, did,sellerId)
+        values (#{ownerId},#{did},#{sellerId});
+    </insert>
+
+    <select id="selectCollection" parameterType="int" resultType="com.example.niftihub.pojo.data.CollectionDO">
+        select * from niftiihub.collection where ownerId=#{ownerId};
+    </select>
+    <delete id="deleteCollection" parameterType="com.example.niftihub.pojo.data.CollectionDO">
+        delete from niftiihub.collection where ownerId=#{ownerId} and did={did} ;
+    </delete>
+
+
+</mapper>

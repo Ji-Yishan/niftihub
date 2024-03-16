@@ -5,21 +5,21 @@
 <mapper namespace="com.example.niftihub.dao.UserMapper">
     <!--    -->
     <insert id="addUser" parameterType="com.example.niftihub.pojo.data.UserDO">
-        insert into niftiihub.user_info (username, password)
-        values (#{username},#{username});
+        insert into niftiihub.user_info (phone, password)
+        values (#{phone},#{password});
     </insert>
 
     <select id="selectUserInfo" parameterType="int" resultType="com.example.niftihub.pojo.data.UserDO">
         select * from niftiihub.user_info where uid=#{uid};
+    </select>
+    <select id="login" parameterType="String" resultType="com.example.niftihub.pojo.data.UserDO">
+        select * from niftiihub.user_info where phone=#{phone};
     </select>
 
     <update id="updateUserInfo" parameterType="com.example.niftihub.pojo.data.UserDO">
 
         update niftiihub.user_info
         <set>
-            <if test="phone != null">
-                phone = #{phone},
-            </if>
             <if test="username != null">
                 username = #{username},
             </if>
@@ -28,9 +28,6 @@
             </if>
             <if test="profileP != null">
                 profileP = #{profileP},
-            </if>
-            <if test="password != null">
-                password = #{password},
             </if>
 
         </set>
@@ -43,5 +40,13 @@
     <delete id="deleteUser" parameterType="int">
         delete from niftiihub.user_info where uid=#{uid} ;
     </delete>
+    <update id="updatePhone" parameterType="com.example.niftihub.pojo.data.UserDO">
+        update niftiihub.user_info set phone=#{phone}
+        where uid=#{uid};
+    </update>
+    <update id="updatePassword" parameterType="com.example.niftihub.pojo.data.UserDO">
+        update niftiihub.user_info set password=#{password}
+        where uid=#{uid};
+    </update>
 
 </mapper>

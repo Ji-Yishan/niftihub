@@ -1,19 +1,17 @@
-package com.example.niftihub.dao;
+package com.example.niftihub.service.inter;
 
 import com.example.niftihub.pojo.data.UserDO;
-import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author: Isabella
- * @create: 2023-09-26 23:49
+ * @create: 2024-03-16 19:33
  **/
-@Mapper
-public interface UserMapper {
+public interface  UserService {
+    int login(UserDO userDO);
     UserDO selectUserInfo(int uid);
     int addUser(UserDO userDO);
     int updateUserInfo(UserDO userDO);
     int deleteUser(int uid);
-    UserDO login(UserDO userDO);
     int updatePhone(UserDO userDO);
     int updatePassword(UserDO userDO);
 }
