@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.niftihub.dao.OrderMapper">
+    <!--    -->
+    <insert id="addOrder" parameterType="com.example.niftihub.pojo.data.OrderDO">
+        insert into niftiihub.order (sellerId, buyerId,`time`,did,id,status)
+        values (#{sellerId},#{buyerId},#{time},#{did},#{id},#{status});
+    </insert>
+
+    <select id="selectSellerOrder" parameterType="int" resultType="com.example.niftihub.pojo.data.OrderDO">
+        select * from niftiihub.order where sellerId=#{sellerId};
+    </select>
+    <select id="selectBuyerOrder" parameterType="int" resultType="com.example.niftihub.pojo.data.OrderDO">
+        select * from niftiihub.order where buyerId=#{buyerId};
+    </select>
+
+    <update id="updateOrder" parameterType="com.example.niftihub.pojo.data.OrderDO">
+
+        update niftiihub.order
+        <set>
+            <if test="time != null">
+                time = #{time},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+
+        </set>
+
+        <where >
+            oid=#{oid};
+        </where>
+    </update>
+    <delete id="deleteOrder" parameterType="int">
+        delete from niftiihub.order where oid=#{oid} ;
+    </delete>
+    <select id="selectOrderById" parameterType="int" resultType="com.example.niftihub.pojo.data.OrderDO">
+        select * from niftiihub.order where `oid`=#{oid};
+    </select>
+
+</mapper>

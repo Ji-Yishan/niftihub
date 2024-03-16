@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.niftihub.dao.DesignMapper">
+    <update id="updateDesign" parameterType="com.example.niftihub.pojo.data.DesignDO">
+
+        update niftiihub.design
+        <set>
+            <if test="name != null">
+                `name` = #{name},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="info != null">
+                info = #{info},
+            </if>
+            <if test="brand != null">
+                brand = #{brand},
+            </if>
+            <if test="pic != null">
+                pic = #{pic},
+            </if>
+            <if test="time != null">
+                `time` = #{time},
+            </if>
+            <if test="describe != null">
+                `describe` = #{describe},
+            </if>
+            <if test="right != null">
+                `right` = #{right},
+            </if>
+            <if test="amount != null">
+                amount = #{amount},
+            </if>
+
+        </set>
+        <where >
+            did=#{did};
+        </where>
+
+    </update>
+    <insert id="addDesign" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
+        insert into niftiihub.design (uid, did,`name`,price,info,brand,pic,
+                                      `time`,id,`describe`,`right`,amount)
+        values (#{uid},#{did},#{name},#{price},#{info},#{brand},#{pic},
+                #{time},#{id},#{describe},#{right},#{amount});
+    </insert>
+    <select id="selectMyDesign" parameterType="int" resultType="com.example.niftihub.pojo.data.DesignDO">
+        select * from niftiihub.design where uid=#{uid};
+    </select>
+    <select id="selectDesignById" parameterType="int" resultType="com.example.niftihub.pojo.data.DesignDO">
+        select * from niftiihub.design where did=#{did};
+    </select>
+    <delete id="deleteDesign" parameterType="int">
+        delete from niftiihub.design where did=#{did} ;
+    </delete>
+    <select id="selectDesignByname" parameterType="String" resultType="com.example.niftihub.pojo.data.DesignDO">
+        select * from niftiihub.design where name like #{did};
+    </select>
+    <select id="selectAll" parameterType="String" resultType="com.example.niftihub.pojo.data.DesignDO">
+        select * from niftiihub.design ;
+    </select>
+</mapper>

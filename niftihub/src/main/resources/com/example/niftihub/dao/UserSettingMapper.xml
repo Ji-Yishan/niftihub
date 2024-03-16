@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.niftihub.dao.UserSettingMapper">
+    <update id="updateSetting" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
+
+        update niftiihub.user_setting
+        <set>
+            <if test="showCollection != null">
+                showCollection = #{showCollection},
+            </if>
+            <if test="showDesign != null">
+                showDesign = #{showDesign},
+            </if>
+        </set>
+        <where >
+            uid=#{uid};
+        </where>
+
+    </update>
+    <update id="reconizeUser" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
+        update niftiihub.user_setting set recognized=#{recognized}
+                                      where uid=#{uid};
+    </update>
+    <insert id="addSetting" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
+        insert into niftiihub.user_setting (uid, recognized)
+        values (#{uid},#{recognized});
+    </insert>
+    <select id="selectUserSetting" parameterType="int" resultType="com.example.niftihub.pojo.data.UserSettingDO">
+        select * from niftiihub.user_setting where uid=#{uid};
+    </select>
+</mapper>
