@@ -38,6 +38,8 @@ public class RabbitMQListen {
         }else {
             ChatEndpoint.sendGroupMessage(messageDO);
         }
+
+
     }
     public void handingSystemMessage(WebsocketMessage websocketMessage){
 

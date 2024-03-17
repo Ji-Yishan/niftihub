@@ -8,6 +8,10 @@
         values (#{UID},#{fromUid},#{message},#{ifPrivate},#{targetUid},#{time});
     </insert>
 
+    <select id="selectMessage" parameterType="String" resultType="com.example.niftihub.pojo.data.MessageDO">
+        select * from niftiihub.message where UID=#{UID};
+    </select>
+
 
 
 </mapper>

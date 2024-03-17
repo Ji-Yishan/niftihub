@@ -2,12 +2,15 @@ package com.example.niftihub.ws;
 
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.example.niftihub.component.RabbitMQSend;
 import com.example.niftihub.config.WebSocketGetHttpSessionConfig;
 import com.example.niftihub.controller.UserController;
 import com.example.niftihub.pojo.data.MessageDO;
+import com.example.niftihub.service.impl.MessageServiceImpl;
 import com.example.niftihub.uitl.UUID;
+import com.example.niftihub.ws.pojo.MessageError;
 import com.example.niftihub.ws.pojo.OnlineUsers;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -23,6 +26,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 @ServerEndpoint(value = "/chat",configurator = WebSocketGetHttpSessionConfig.class)
@@ -31,10 +35,15 @@ public class ChatEndpoint {
     private HttpSession httpSession;
     private String userUid;
     private static RabbitMQSend rabbitMQSend;
+    private static MessageServiceImpl messageService;
 
     @Autowired
     public void setRabbitMQSend(RabbitMQSend rabbitMQSend){
         ChatEndpoint.rabbitMQSend = rabbitMQSend;
+    }
+    @Autowired
+    public void setMessageService(MessageServiceImpl messageService){
+        ChatEndpoint.messageService = messageService;
     }
 
 
@@ -48,6 +57,8 @@ public class ChatEndpoint {
             userUid = session.getId();
         }
         OnlineUsers.addUser(userUid,session);
+        //System.out.println(messageService.selectMessage("99c26817612b460eb1b0eefc1093ed09"));
+
         //todo 接下来是数据库操作
         //读取redis，查看未读消息，发送消息
 //        MessageDO messageDO = new MessageDO(UUID.getUUID(),"1","消息",true,"1", DateUtil.now());
@@ -63,11 +74,19 @@ public class ChatEndpoint {
 
     //发送消息，如果对方不在线，则只保存在数据库，不发送
     @OnMessage
-    public void onMessage(String message){
+    public void onMessage(String message) throws IOException {
         //todo 对数据进行校验 校验失败则返回系统消息
-
-        //交给消息队列完成
-        rabbitMQSend.send(message);
+        MessageError messageError = verifyTheData(message);
+        if(messageError == MessageError.TRUE) {
+            //交给消息队列完成
+            rabbitMQSend.send(message);
+        }else {
+            JSONObject jsonObject = JSONUtil.createObj()
+                            .putOnce("system",true)
+                            .putOnce("message",messageError.toString())
+                            .putOnce("time",DateUtil.now());
+            OnlineUsers.getSession(this.userUid).getBasicRemote().sendText(jsonObject.toString());
+        }
     }
     //异常
     @OnError
@@ -106,6 +125,38 @@ public class ChatEndpoint {
 
 
 
+    }
+
+    public static MessageError verifyTheData(String message){
+        JSONObject jsonMessage = JSONUtil.parseObj(message);
+        if(jsonMessage.get("time") == null){
+            return MessageError.TIME_NULL;
+        }
+        String system = (String) jsonMessage.get("system");
+        if(Objects.equals(system,"true")){
+            //系统消息验证
+        }else if(Objects.equals(system,"false")){
+            //验证非系统消息
+            if(jsonMessage.get("fromUid") == null){
+                return MessageError.FROMUID_NULL;
+            }
+            if(jsonMessage.get("message") == null){
+                return MessageError.MESSAGE_NULL;
+            }
+            if(! (Objects.equals(jsonMessage.get("ifPrivate"),"true") ||
+                    Objects.equals(jsonMessage.get("ifPrivate"),"false"))){
+                return MessageError.PRIVATE_ERROR;
+            }
+            if(jsonMessage.get("targetUid") == null){
+                return MessageError.TARGETUID_NULL;
+            }
+        }else{
+            return MessageError.SYSTEM_ERROR;
+        }
+
+
+
+        return MessageError.TRUE;
     }
 
 
