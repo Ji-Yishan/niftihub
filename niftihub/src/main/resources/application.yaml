@@ -13,7 +13,15 @@ spring:
       port: 6379
       database: 0
       password: sdfhh893whfj09ewj0w9j89shfh908q2h89hfSsFESFE684f8es
+  rabbitmq:
+    host: 8.134.219.139
+    port: 5672
+    virtual-host: /niftihub
+    username: niftihub
+    password: niftihub
 
+qsADXS:
+  test: 123456
 #  data:
 #    redis:
 #      host: 127.0.0.1
