@@ -12,11 +12,13 @@ import com.example.niftihub.service.impl.MessageServiceImpl;
 import com.example.niftihub.uitl.UUID;
 import com.example.niftihub.ws.pojo.MessageError;
 import com.example.niftihub.ws.pojo.OnlineUsers;
+import com.example.niftihub.ws.pojo.SystemMessageType;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.jdbc.Null;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,13 +59,18 @@ public class ChatEndpoint {
             userUid = session.getId();
         }
         OnlineUsers.addUser(userUid,session);
-        //System.out.println(messageService.selectMessage("99c26817612b460eb1b0eefc1093ed09"));
 
-        //todo 接下来是数据库操作
-        //读取redis，查看未读消息，发送消息
-//        MessageDO messageDO = new MessageDO(UUID.getUUID(),"1","消息",true,"1", DateUtil.now());
-//        rabbitMQSend.send(JSONUtil.toJsonStr(messageDO));
-
+        JSONObject message = JSONUtil.createObj()
+                .putOnce("type",SystemMessageType.USER_ONLINE.toString())
+                .putOnce("data", null);
+        JSONObject systemMessage = JSONUtil.createObj()
+                .putOnce("system",true)
+                .putOnce("message",message.toString())
+                .putOnce("targetUid",userUid)
+                .putOnce("fromUid",userUid)
+                .putOnce("time",DateUtil.now());
+        //发送用户上线消息
+        rabbitMQSend.send(systemMessage.toString());
     }
     //关闭连接，需要将用户从在线用户中删除
     @OnClose
@@ -72,10 +79,10 @@ public class ChatEndpoint {
         OnlineUsers.remove(userUid);
     }
 
-    //发送消息，如果对方不在线，则只保存在数据库，不发送
+    //收到客户端消息
     @OnMessage
     public void onMessage(String message) throws IOException {
-        //todo 对数据进行校验 校验失败则返回系统消息
+        log.info("客户端发送消息");
         MessageError messageError = verifyTheData(message);
         if(messageError == MessageError.TRUE) {
             //交给消息队列完成
@@ -99,7 +106,7 @@ public class ChatEndpoint {
         //去除用户
         OnlineUsers.remove(session.getId());
     }
-
+    //todo 后续删除
     @Scheduled(fixedRate = 2000)
     public void sendMessage() throws IOException {
         for(String key: OnlineUsers.getKeySet()){
@@ -107,57 +114,60 @@ public class ChatEndpoint {
         }
     }
 
-    public static void sendPrivateMessage(MessageDO messageDO) throws IOException {
+    public static void sendMessage(MessageDO messageDO) throws IOException {
 
         String userUid = messageDO.getFromUid();
-
         Session session = OnlineUsers.getSession(userUid);
         if(session != null){
             session.getBasicRemote().sendText(JSONUtil.toJsonStr(messageDO));
         }
-        //todo 往redis中放未读消息（为保护服务器，过期时间设置为1周）
 
     }
-
+    //todo
     public static void sendGroupMessage(MessageDO messageDO){
+        //读取数据库，获取成员信息，如果在在线就发送消息（调用上面的函数），然后给所有人添加一条未读消息
 
-        //读取数据库，获取成员信息，然后发送消息（调用上面的函数）
 
 
 
     }
 
     public static MessageError verifyTheData(String message){
-        JSONObject jsonMessage = JSONUtil.parseObj(message);
-        if(jsonMessage.get("time") == null){
+        JSONObject messageJson = JSONUtil.parseObj(message);
+        if(messageJson.get("time") == null){
             return MessageError.TIME_NULL;
         }
-        String system = (String) jsonMessage.get("system");
+        if(messageJson.get("fromUid") == null){
+            return MessageError.FROMUID_NULL;
+        }
+        if(messageJson.get("targetUid") == null){
+            return MessageError.TARGETUID_NULL;
+        }
+        String system = (String) messageJson.get("system");
         if(Objects.equals(system,"true")){
+            log.info("系统消息");
             //系统消息验证
-        }else if(Objects.equals(system,"false")){
-            //验证非系统消息
-            if(jsonMessage.get("fromUid") == null){
-                return MessageError.FROMUID_NULL;
+            JSONObject systemMessageJson = new JSONObject(messageJson.get("message"));
+            try{
+                SystemMessageType.valueOf((String) systemMessageJson.get("type"));
+            }catch (IllegalArgumentException illegalArgumentException){
+                return MessageError.ERROR;
             }
-            if(jsonMessage.get("message") == null){
+        }else if(Objects.equals(system,"false")){
+            log.info("非系统消息");
+            //验证非系统消息
+            if(messageJson.get("message") == null){
                 return MessageError.MESSAGE_NULL;
             }
-            if(! (Objects.equals(jsonMessage.get("ifPrivate"),"true") ||
-                    Objects.equals(jsonMessage.get("ifPrivate"),"false"))){
+            if(! (Objects.equals(messageJson.get("ifPrivate"),"true") ||
+                    Objects.equals(messageJson.get("ifPrivate"),"false"))){
                 return MessageError.PRIVATE_ERROR;
-            }
-            if(jsonMessage.get("targetUid") == null){
-                return MessageError.TARGETUID_NULL;
             }
         }else{
             return MessageError.SYSTEM_ERROR;
         }
 
-
-
         return MessageError.TRUE;
     }
-
 
 }

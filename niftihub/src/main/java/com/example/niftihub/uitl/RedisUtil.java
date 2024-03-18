@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@Deprecated
 public class RedisUtil {
 
     @Autowired

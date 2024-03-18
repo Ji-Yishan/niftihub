@@ -18,30 +18,41 @@ public class RabbitMQListen {
     @Autowired
     MessageServiceImpl messageService;
     @RabbitListener(queues = "message")
-    public void listen(String msg){
+    public void listen(String msg) throws IOException {
         log.info("接收到："+msg);
         WebsocketMessage websocketMessage = JSONUtil.toBean(msg, WebsocketMessage.class);
-        if(websocketMessage.isSystem()){
-            handingSystemMessage(websocketMessage);
-        }else{
-            handingSystemMessage(websocketMessage);
-        }
+        //todo 取消注释
+//        if(websocketMessage.isSystem()){
+//            handingMessage(websocketMessage);
+//        }else{
+//            handingSystemMessage(websocketMessage);
+//        }
     }
 
     public void handingMessage(WebsocketMessage websocketMessage) throws IOException {
         MessageDO messageDO = new MessageDO(websocketMessage);
         //往数据库中存
         messageService.addMessage(messageDO);
-        //todo 然后给目标发送消息
+        //然后给目标发送消息
         if(messageDO.isIfPrivate()){
-            ChatEndpoint.sendPrivateMessage(messageDO);
+            ChatEndpoint.sendMessage(messageDO);
+            //todo 往redis中放未读消息（为保护服务器，过期时间设置为1周）
+
+
         }else {
             ChatEndpoint.sendGroupMessage(messageDO);
+            //todo 往redis中放未读消息（为保护服务器，过期时间设置为1周）
+
+
         }
 
 
     }
     public void handingSystemMessage(WebsocketMessage websocketMessage){
+        //todo 判断系统消息类型，进行相应操作
+
+
+
 
     }
 }

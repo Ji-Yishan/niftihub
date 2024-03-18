@@ -5,5 +5,6 @@ public enum SystemMessageType {
     UNREAD_MESSAGE,//某个未读消息
     JOIN_GROUP,//加入某个群聊
     QUIT_GROUP,//退出某个群聊
+    USER_ONLINE;//用户上线
     
 }
