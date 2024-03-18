@@ -32,16 +32,16 @@ public class RabbitMQListen {
     public void handingMessage(WebsocketMessage websocketMessage) throws IOException {
         MessageDO messageDO = new MessageDO(websocketMessage);
         //往数据库中存
-        messageService.addMessage(messageDO);
+        int i = messageService.addMessage(messageDO);
         //然后给目标发送消息
         if(messageDO.isIfPrivate()){
             ChatEndpoint.sendMessage(messageDO);
-            //todo 往redis中放未读消息（为保护服务器，过期时间设置为1周）
+            //todo 往redis中放未读消息
 
 
         }else {
             ChatEndpoint.sendGroupMessage(messageDO);
-            //todo 往redis中放未读消息（为保护服务器，过期时间设置为1周）
+            //todo 往redis中放未读消息
 
 
         }
