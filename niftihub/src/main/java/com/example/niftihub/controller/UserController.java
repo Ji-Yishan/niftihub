@@ -6,6 +6,7 @@ import com.example.niftihub.pojo.data.UserDO;
 import com.example.niftihub.pojo.dto.LoginDTO;
 import com.example.niftihub.service.inter.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +22,12 @@ public class UserController {
     Result result;
 
     @PostMapping("/register")
-    public LoginDTO register(@RequestBody UserDO userDO){
+    public LoginDTO register(@RequestBody UserDO userDO, HttpSession session){
         int uid=userService.addUser(userDO);
 //        todo 换成真的token
         String token="temp token";
         LoginDTO loginDTO=new LoginDTO(token,uid);
+        session.setAttribute("uid",uid);
         return loginDTO;
     }
 
