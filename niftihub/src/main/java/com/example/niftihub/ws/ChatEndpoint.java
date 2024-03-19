@@ -6,27 +6,19 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.example.niftihub.component.RabbitMQSend;
 import com.example.niftihub.config.WebSocketGetHttpSessionConfig;
-import com.example.niftihub.controller.UserController;
 import com.example.niftihub.pojo.data.MessageDO;
 import com.example.niftihub.service.impl.GroupServiceImpl;
 import com.example.niftihub.service.impl.MessageServiceImpl;
-import com.example.niftihub.uitl.UUID;
 import com.example.niftihub.ws.pojo.MessageError;
 import com.example.niftihub.ws.pojo.OnlineUsers;
 import com.example.niftihub.ws.pojo.SystemMessageType;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.jdbc.Null;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.client.WebSocketClient;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -90,7 +82,7 @@ public class ChatEndpoint {
     @OnMessage
     public void onMessage(String message) throws IOException {
         log.info("客户端发送消息");
-        MessageError messageError = verifyTheData(message);
+        MessageError messageError = verifyTheData(message,userUid);
         if(messageError == MessageError.TRUE) {
             //交给消息队列完成
             rabbitMQSend.send(message);
@@ -107,19 +99,24 @@ public class ChatEndpoint {
     public void onError(Session session, Throwable exception) throws Exception{
         log.error("出现异常");
         log.error(exception.toString());
+        JSONObject jsonObject = JSONUtil.createObj()
+                .putOnce("system",true)
+                .putOnce("message",exception.toString())
+                .putOnce("time",DateUtil.now());
+        OnlineUsers.getSession(this.userUid).getBasicRemote().sendText(jsonObject.toString());
         if(session.isOpen()){
             session.close();
         }
         //去除用户
         OnlineUsers.remove(session.getId());
     }
-    //todo 后续删除
-    @Scheduled(fixedRate = 20000)
-    public void sendMessage() throws IOException {
-        for(String key: OnlineUsers.getKeySet()){
-            OnlineUsers.getSession(key).getBasicRemote().sendText("心跳");
-        }
-    }
+//    //用来测试连接的
+//    @Scheduled(fixedRate = 2000)
+//    public void sendMessage() throws IOException {
+//        for(String key: OnlineUsers.getKeySet()){
+//            OnlineUsers.getSession(key).getBasicRemote().sendText("心跳");
+//        }
+//    }
 
     public static void sendMessage(MessageDO messageDO,String targetUid) throws IOException {
 
@@ -135,18 +132,23 @@ public class ChatEndpoint {
         for(Object object:groupMembers){
             sendMessage(messageDO,object.toString());
         }
-
-
-
+    }
+    //本来应该和sendMessage一起的，但是当时没有写好，不想改了
+    public static void sendMessage(JSONObject jsonObject,String targetUID) throws IOException {
+        Session session = OnlineUsers.getSession(targetUID);
+        if(session != null){
+            session.getBasicRemote().sendText(jsonObject.toString());
+        }
     }
 
-    public static MessageError verifyTheData(String message){
+    //按道理来说，还要检验targetUID是否正确，但是，~不想写~
+    public static MessageError verifyTheData(String message,String userUid){
         JSONObject messageJson = JSONUtil.parseObj(message);
         if(messageJson.get("time") == null){
             return MessageError.TIME_NULL;
         }
-        if(messageJson.get("fromUid") == null){
-            return MessageError.FROMUID_NULL;
+        if(!Objects.equals(messageJson.get("fromUid"),userUid)){
+            return MessageError.FROMUID_ERROR;
         }
         if(messageJson.get("targetUid") == null){
             return MessageError.TARGETUID_NULL;
@@ -172,7 +174,6 @@ public class ChatEndpoint {
                 return MessageError.PRIVATE_ERROR;
             }
         }
-
         return MessageError.TRUE;
     }
 

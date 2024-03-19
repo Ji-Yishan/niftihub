@@ -12,16 +12,16 @@ public class GroupServiceImpl implements GroupService {
     RedisUtil redisUtil;
     @Override
     public long joinGroup(String groupUID, String userUID) {
-        return redisUtil.sSet("nifthub-group-"+groupUID,userUID);
+        return redisUtil.sSet("niftihub-group-"+groupUID,userUID);
     }
 
     @Override
     public long exitGroup(String groupUID, String userUID) {
-        return redisUtil.setRemove("nifthub-group-"+groupUID,userUID);
+        return redisUtil.setRemove("niftihub-group-"+groupUID,userUID);
     }
 
     @Override
     public Set<Object> getGroupMembers(String groupUID) {
-        return redisUtil.sGet("nifthub-group-"+groupUID);
+        return redisUtil.sGet("niftihub-group-"+groupUID);
     }
 }

@@ -30,16 +30,16 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public long setUnreadMessage(String UID, String messageUID) {
-        return redisUtil.sSet("nifthub-unread-"+UID,messageUID);
+        return redisUtil.sSet("niftihub-unread-"+UID,messageUID);
     }
 
     @Override
     public Set<Object> getUnreadMessage(String UID) {
-        return redisUtil.sGet("nifthub-unread-"+UID);
+        return redisUtil.sGet("niftihub-unread-"+UID);
     }
 
     @Override
     public long setUnreadRemove(String UID, String messageUID) {
-        return redisUtil.setRemove("nifthub-unread-"+UID,messageUID);
+        return redisUtil.setRemove("niftihub-unread-"+UID,messageUID);
     }
 }

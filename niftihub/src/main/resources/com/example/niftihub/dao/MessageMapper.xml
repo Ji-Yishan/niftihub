@@ -4,12 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.niftihub.dao.MessageMapper">
     <insert id="addMessage" parameterType="com.example.niftihub.pojo.data.MessageDO">
-        insert into niftiihub.message (UID, fromUid,message,ifPrivate,targetUid,`time`)
+        insert into niftihub.message (UID, fromUid,message,ifPrivate,targetUid,`time`)
         values (#{UID},#{fromUid},#{message},#{ifPrivate},#{targetUid},#{time});
     </insert>
 
     <select id="selectMessage" parameterType="String" resultType="com.example.niftihub.pojo.data.MessageDO">
-        select * from niftiihub.message where UID=#{UID};
+        select * from niftihub.message where UID=#{UID};
     </select>
 
 
