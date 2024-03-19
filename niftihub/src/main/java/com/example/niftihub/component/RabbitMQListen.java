@@ -1,11 +1,13 @@
 package com.example.niftihub.component;
 
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.example.niftihub.pojo.data.MessageDO;
 import com.example.niftihub.service.impl.GroupServiceImpl;
 import com.example.niftihub.service.impl.MessageServiceImpl;
 import com.example.niftihub.service.inter.MessageService;
 import com.example.niftihub.ws.ChatEndpoint;
+import com.example.niftihub.ws.pojo.SystemMessageType;
 import com.example.niftihub.ws.pojo.WebsocketMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -52,14 +54,47 @@ public class RabbitMQListen {
             for(Object object:groupMembers){
                 messageService.setUnreadMessage(object.toString(),messageDO.getUID());
             }
-
         }
-
-
     }
     public void handingSystemMessage(WebsocketMessage websocketMessage){
         //todo 判断系统消息类型，进行相应操作
+        String message = JSONUtil.parseObj(websocketMessage).get("message").toString();
+        SystemMessageType systemMessageType =
+                JSONUtil.parseObj(message).get("type", SystemMessageType.class);
+        if(systemMessageType == SystemMessageType.READ_MESSAGE){
+            messageService.setUnreadRemove(websocketMessage.getFromUid(), websocketMessage.getTargetUid());
+            log.info("已读某个消息");
+        }else if(systemMessageType == SystemMessageType.JOIN_GROUP){
+            groupService.joinGroup(websocketMessage.getTargetUid(), websocketMessage.getFromUid());
+        }else if(systemMessageType == SystemMessageType.QUIT_GROUP){
+            groupService.exitGroup(websocketMessage.getTargetUid(), websocketMessage.getFromUid());
+        } else if(systemMessageType == SystemMessageType.USER_ONLINE){
+            Set<Object> unreadMessage =
+                    messageService.getUnreadMessage(websocketMessage.getFromUid());
+            for(Object object:unreadMessage){
+                //todo 查询mysql获得消息
+            }
 
+        }else {
+            log.error("错误的系统消息");
+        }
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
