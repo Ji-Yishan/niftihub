@@ -8,6 +8,7 @@ import com.example.niftihub.component.RabbitMQSend;
 import com.example.niftihub.config.WebSocketGetHttpSessionConfig;
 import com.example.niftihub.controller.UserController;
 import com.example.niftihub.pojo.data.MessageDO;
+import com.example.niftihub.service.impl.GroupServiceImpl;
 import com.example.niftihub.service.impl.MessageServiceImpl;
 import com.example.niftihub.uitl.UUID;
 import com.example.niftihub.ws.pojo.MessageError;
@@ -29,6 +30,7 @@ import org.springframework.web.socket.client.WebSocketClient;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 
 @Component
 @ServerEndpoint(value = "/chat",configurator = WebSocketGetHttpSessionConfig.class)
@@ -38,6 +40,7 @@ public class ChatEndpoint {
     private String userUid;
     private static RabbitMQSend rabbitMQSend;
     private static MessageServiceImpl messageService;
+    private static GroupServiceImpl groupService;
 
     @Autowired
     public void setRabbitMQSend(RabbitMQSend rabbitMQSend){
@@ -46,6 +49,10 @@ public class ChatEndpoint {
     @Autowired
     public void setMessageService(MessageServiceImpl messageService){
         ChatEndpoint.messageService = messageService;
+    }
+    @Autowired
+    public void setGroupService(GroupServiceImpl groupService){
+        ChatEndpoint.groupService = groupService;
     }
 
 
@@ -107,26 +114,27 @@ public class ChatEndpoint {
         OnlineUsers.remove(session.getId());
     }
     //todo 后续删除
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 20000)
     public void sendMessage() throws IOException {
         for(String key: OnlineUsers.getKeySet()){
             OnlineUsers.getSession(key).getBasicRemote().sendText("心跳");
         }
     }
 
-    public static void sendMessage(MessageDO messageDO) throws IOException {
+    public static void sendMessage(MessageDO messageDO,String targetUid) throws IOException {
 
-        String userUid = messageDO.getFromUid();
-        Session session = OnlineUsers.getSession(userUid);
+        Session session = OnlineUsers.getSession(targetUid);
         if(session != null){
             session.getBasicRemote().sendText(JSONUtil.toJsonStr(messageDO));
         }
 
     }
-    //todo
-    public static void sendGroupMessage(MessageDO messageDO){
-        //读取数据库，获取成员信息，如果在在线就发送消息（调用上面的函数），然后给所有人添加一条未读消息
-
+    public static void sendGroupMessage(MessageDO messageDO) throws IOException {
+        //读取数据库，获取成员信息，如果在在线就发送消息（调用上面的函数）
+        Set<Object> groupMembers = groupService.getGroupMembers(messageDO.getTargetUid());
+        for(Object object:groupMembers){
+            sendMessage(messageDO,object.toString());
+        }
 
 
 
@@ -143,8 +151,8 @@ public class ChatEndpoint {
         if(messageJson.get("targetUid") == null){
             return MessageError.TARGETUID_NULL;
         }
-        String system = (String) messageJson.get("system");
-        if(Objects.equals(system,"true")){
+        boolean system = (boolean) messageJson.get("system");
+        if(system){
             log.info("系统消息");
             //系统消息验证
             JSONObject systemMessageJson = new JSONObject(messageJson.get("message"));
@@ -153,18 +161,16 @@ public class ChatEndpoint {
             }catch (IllegalArgumentException illegalArgumentException){
                 return MessageError.ERROR;
             }
-        }else if(Objects.equals(system,"false")){
+        }else{
             log.info("非系统消息");
             //验证非系统消息
             if(messageJson.get("message") == null){
                 return MessageError.MESSAGE_NULL;
             }
-            if(! (Objects.equals(messageJson.get("ifPrivate"),"true") ||
-                    Objects.equals(messageJson.get("ifPrivate"),"false"))){
+            if(! (Objects.equals(messageJson.get("ifPrivate"),true) ||
+                    Objects.equals(messageJson.get("ifPrivate"),false))){
                 return MessageError.PRIVATE_ERROR;
             }
-        }else{
-            return MessageError.SYSTEM_ERROR;
         }
 
         return MessageError.TRUE;

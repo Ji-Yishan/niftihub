@@ -18,7 +18,11 @@ public class MessageDO {
     private String time;//发送时间
 
     public MessageDO(WebsocketMessage websocketMessage) {
-        this.UID = UUID.getUUID();
+        if(websocketMessage.getUID() == null){
+            this.UID = UUID.getUUID();
+        }else{
+            this.UID = websocketMessage.getUID();
+        }
         this.fromUid = websocketMessage.getFromUid();
         this.message = websocketMessage.getMessage();
         this.ifPrivate = websocketMessage.isIfPrivate();

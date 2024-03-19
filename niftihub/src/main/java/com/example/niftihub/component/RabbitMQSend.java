@@ -13,7 +13,7 @@ public class RabbitMQSend {
     private RabbitTemplate rabbitTemplate;
     private static String queueName = "message";
     public void send(String message){
-        log.info("发送："+message);
+        log.info("发送消息到消息队列");
         rabbitTemplate.convertAndSend(queueName,message);
     }
 

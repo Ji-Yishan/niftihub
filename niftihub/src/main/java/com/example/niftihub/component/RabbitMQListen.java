@@ -2,7 +2,9 @@ package com.example.niftihub.component;
 
 import cn.hutool.json.JSONUtil;
 import com.example.niftihub.pojo.data.MessageDO;
+import com.example.niftihub.service.impl.GroupServiceImpl;
 import com.example.niftihub.service.impl.MessageServiceImpl;
+import com.example.niftihub.service.inter.MessageService;
 import com.example.niftihub.ws.ChatEndpoint;
 import com.example.niftihub.ws.pojo.WebsocketMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -11,38 +13,45 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Component
 @Slf4j
 public class RabbitMQListen {
     @Autowired
     MessageServiceImpl messageService;
+    @Autowired
+    GroupServiceImpl groupService;
     @RabbitListener(queues = "message")
     public void listen(String msg) throws IOException {
-        log.info("接收到："+msg);
+        log.info("接收到消息队列消息");
         WebsocketMessage websocketMessage = JSONUtil.toBean(msg, WebsocketMessage.class);
         //todo 取消注释
-//        if(websocketMessage.isSystem()){
-//            handingMessage(websocketMessage);
-//        }else{
-//            handingSystemMessage(websocketMessage);
-//        }
+        if(websocketMessage.isSystem()){
+            log.info("系统消息");
+            handingSystemMessage(websocketMessage);
+        }else{
+            log.info("非系统消息");
+            handingMessage(websocketMessage);
+        }
     }
 
     public void handingMessage(WebsocketMessage websocketMessage) throws IOException {
         MessageDO messageDO = new MessageDO(websocketMessage);
         //往数据库中存
-        int i = messageService.addMessage(messageDO);
+        messageService.addMessage(messageDO);
+        log.info("往mysql存消息："+messageDO.getUID());
         //然后给目标发送消息
         if(messageDO.isIfPrivate()){
-            ChatEndpoint.sendMessage(messageDO);
-            //todo 往redis中放未读消息
-
-
+            ChatEndpoint.sendMessage(messageDO,messageDO.getTargetUid());
+            //todo 设置过期时间
+            messageService.setUnreadMessage(messageDO.getTargetUid(),messageDO.getUID());
         }else {
             ChatEndpoint.sendGroupMessage(messageDO);
-            //todo 往redis中放未读消息
-
+            Set<Object> groupMembers = groupService.getGroupMembers(messageDO.getTargetUid());
+            for(Object object:groupMembers){
+                messageService.setUnreadMessage(object.toString(),messageDO.getUID());
+            }
 
         }
 
@@ -50,8 +59,6 @@ public class RabbitMQListen {
     }
     public void handingSystemMessage(WebsocketMessage websocketMessage){
         //todo 判断系统消息类型，进行相应操作
-
-
 
 
     }
