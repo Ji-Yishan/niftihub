@@ -38,6 +38,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDO selectUserInfoByPhone(String phone) {
+        return userMapper.selectUserInfoByPhone(phone);
+    }
+
+    @Override
     public int addUser(UserDO userDO) {
         userMapper.addUser(userDO);
         UserDO userDO1=userMapper.login(userDO);

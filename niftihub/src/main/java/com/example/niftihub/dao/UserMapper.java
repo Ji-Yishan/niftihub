@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserMapper {
     UserDO selectUserInfo(int uid);
+    UserDO selectUserInfoByPhone(String phone);
     int addUser(UserDO userDO);
     int updateUserInfo(UserDO userDO);
     int deleteUser(int uid);

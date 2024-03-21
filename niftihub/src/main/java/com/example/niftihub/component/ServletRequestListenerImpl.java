@@ -13,6 +13,5 @@ public class ServletRequestListenerImpl implements ServletRequestListener {
         //将所有request请求都携带上httpSession
         ((HttpServletRequest) sre.getServletRequest()).getSession();
         log.info("监听器");
-
     }
 }

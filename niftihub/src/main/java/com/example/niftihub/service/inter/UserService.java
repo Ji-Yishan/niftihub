@@ -9,6 +9,7 @@ import com.example.niftihub.pojo.data.UserDO;
 public interface  UserService {
     int login(UserDO userDO);
     UserDO selectUserInfo(int uid);
+    UserDO selectUserInfoByPhone(String phone);
     int addUser(UserDO userDO);
     int updateUserInfo(UserDO userDO);
     int deleteUser(int uid);

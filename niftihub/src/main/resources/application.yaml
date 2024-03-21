@@ -20,6 +20,10 @@ spring:
     username: niftihub
     password: niftihub
 
+niftihub:
+  allow-url:
+    /register,/login,/test/**
+
 #  data:
 #    redis:
 #      host: 127.0.0.1

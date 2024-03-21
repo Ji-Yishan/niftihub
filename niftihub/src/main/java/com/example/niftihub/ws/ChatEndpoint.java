@@ -48,7 +48,11 @@ public class ChatEndpoint {
     }
 
 
-    //ws连接，需要把用户放到在线用户中，然后读取数据库，将未发送的消息进行发送
+    /**
+     * ws连接，需要把用户放到在线用户中，然后读取数据库，将未发送的消息进行发送
+     * @param session
+     * @param config
+     */
     @OnOpen
     public void onOpen(Session session, EndpointConfig config){
         this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
@@ -71,14 +75,21 @@ public class ChatEndpoint {
         //发送用户上线消息
         rabbitMQSend.send(systemMessage.toString());
     }
-    //关闭连接，需要将用户从在线用户中删除
+    /**
+     * 关闭连接，需要将用户从在线用户中删除
+     * @param session
+     */
     @OnClose
     public void onClose(Session session){
         log.info(userUid+"关闭连接");
         OnlineUsers.remove(userUid);
     }
 
-    //收到客户端消息
+    /***
+     * 收到客户端消息
+     * @param message
+     * @throws IOException
+     */
     @OnMessage
     public void onMessage(String message) throws IOException {
         log.info("客户端发送消息");

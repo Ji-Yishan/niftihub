@@ -1,8 +1,12 @@
 package com.example.niftihub.uitl;
 
 import com.example.niftihub.pojo.data.UserDO;
+import com.example.niftihub.service.impl.UserServiceImpl;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.*;
@@ -16,7 +20,13 @@ import static com.example.niftihub.common.Common.KEY;
  * &#064;create:  2023-09-26 00:12
  **/
 @Slf4j
+@Component
 public class JwtUtils {
+    private static UserServiceImpl userService;
+    @Autowired
+    private void setUserService(UserServiceImpl userService){
+        JwtUtils.userService = userService;
+    }
     private static final String TOKEN_FORMAT="^Bearer:\\S+";
     public static final String TOKEN_PREFIX="Bearer:";
     public static final Pattern TOKEN_PATTEN =Pattern.compile(TOKEN_FORMAT);
@@ -27,12 +37,12 @@ public class JwtUtils {
      *
      * @param ttlMillis jwt过期时间,单位：毫秒？
      * @param user      登录成功的user对象
-     * @param authorization 登录的身份认证，"User","Admin",当为其他值时转化为："User"
+     * @param authorization 登录的身份认证，"user","admin",当为其他值时转化为："user"
      * @return
      */
     public static String createToken(long ttlMillis, UserDO user,String authorization) {
-        if(!authorization.equals("Admin")){
-            authorization = "User";
+        if(!authorization.equals("admin")){
+            authorization = "user";
         }
 
         //指定签名的时候使用的签名算法，也就是header那部分，jjwt已经将这部分内容封装好了。
@@ -46,7 +56,7 @@ public class JwtUtils {
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put("uid", user.getUid());
         claims.put("Authorization", authorization);
-        claims.put("password", user.getPassword());
+        //claims.put("password", user.getPassword());
         //生成签名的时候使用的秘钥secret,这个方法本地封装了的，一般可以从本地配置文件中读取，切记这个秘钥不能外露哦。它就是你服务端的私钥，在任何场景都不应该流露出去。一旦客户端得知这个secret, 那就意味着客户端是可以自我签发jwt了。
 //        String key = user.getPassword();
 
@@ -71,11 +81,22 @@ public class JwtUtils {
         }
         return TOKEN_PREFIX+builder.compact();
     }
+
+    /***
+     * 通过手机号返回一个JWT
+     * @param phone
+     * @return
+     */
+    public static String createToken(String phone){
+        UserDO userDO = userService.selectUserInfoByPhone(phone);
+        return createToken(24 * 60 * 60 * 1000,userDO,"user");
+    }
+
+
     /**
      * Token的解密,
      * 抛出的异常 ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException
      * @param token 加密后的token
-     * @param user  用户的对象
      * @return
      */
     public static Claims parseJWT(String token) {
@@ -105,10 +126,9 @@ public class JwtUtils {
      * 校验token
      * 在这里可以使用官方的校验，我这里校验的是token中携带的密码于数据库一致的话就校验通过
      * @param token
-     * @param user
      * @return
      */
-    public static Boolean isVerify(String token, UserDO user) {
+    public static Boolean isVerify(String token) {
         token=token.substring(7);
         //签名秘钥，和生成的签名的秘钥一模一样
 //        String key = user.getPassword();
@@ -121,9 +141,7 @@ public class JwtUtils {
                     .build()
                     .parseClaimsJws(token).getBody();
             log.info("claims:{}",claims);
-            if (claims.get("password").equals(user.getPassword())) {
-                return true;
-            }
+            return true;
 
         }catch (ExpiredJwtException e){
             e.printStackTrace();

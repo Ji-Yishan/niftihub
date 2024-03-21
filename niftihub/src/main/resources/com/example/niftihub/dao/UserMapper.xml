@@ -12,6 +12,9 @@
     <select id="selectUserInfo" parameterType="int" resultType="com.example.niftihub.pojo.data.UserDO">
         select * from niftiihub.user_info where uid=#{uid};
     </select>
+    <select id="selectUserInfoByPhone" parameterType="String" resultType="com.example.niftihub.pojo.data.UserDO">
+        select * from niftiihub.user_info where phone=#{phone};
+    </select>
     <select id="login" parameterType="String" resultType="com.example.niftihub.pojo.data.UserDO">
         select * from niftiihub.user_info where phone=#{phone};
     </select>
