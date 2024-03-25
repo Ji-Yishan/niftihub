@@ -25,11 +25,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
 
     private static String[] allowUrls;
+    private static String[] adminUrls;
     private static final String tokenHeader = "Authorization";
 
     @Value("${niftihub.allow-url}")
     private void setAllowUrls(String[] allowUrls){
         JwtTokenFilter.allowUrls = allowUrls;
+    }
+    @Value("${niftihub.admin-url}")
+    private void setAdminUrls(String[] adminUrls){
+        JwtTokenFilter.adminUrls = adminUrls;
     }
 
 
@@ -41,7 +46,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         log.info("{}请求：{}",request.getMethod(),request.getRequestURI());
         String token = request.getHeader(tokenHeader);
 
-        if(token == null && matchUrl(request.getRequestURI())){
+        if(token == null && matchUrl(request.getRequestURI(),allowUrls)){
             log.info("无需验证");
             filterChain.doFilter(request, response);
         }
@@ -49,6 +54,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         JwtUtils.getAuthorization(token);
         //验证是否正确
         if(!JwtUtils.isVerify(token)){
+            //todo 改用result
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            PrintWriter writer = response.getWriter();
+            Map<String,Object> map =new HashMap<>();
+            map.put("code",401);
+            writer.write(JSONUtil.toJsonStr(map));
+            writer.flush();
+            return;
+        }
+        //如果为管理员链接
+        if(matchUrl(request.getRequestURI(),adminUrls)&&JwtUtils.getLevel(token)==0){
+            //todo 改用result
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             PrintWriter writer = response.getWriter();
@@ -66,8 +84,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
      * @param requestURI 要判断的路径，如"/login"
      * @return 返回true则无需验证
      */
-    private boolean matchUrl(String requestURI) {
-        for(String allowUrl:allowUrls){
+    private boolean matchUrl(String requestURI,String[] urls) {
+        for(String allowUrl:urls){
             // 首先检查是否是完全匹配的情况
             if (requestURI.equals(allowUrl)) {
                 return true;

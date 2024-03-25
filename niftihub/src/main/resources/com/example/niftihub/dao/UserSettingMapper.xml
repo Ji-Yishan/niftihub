@@ -5,7 +5,7 @@
 <mapper namespace="com.example.niftihub.dao.UserSettingMapper">
     <update id="updateSetting" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
 
-        update niftiihub.user_setting
+        update niftihub.user_setting
         <set>
             <if test="showCollection != null">
                 showCollection = #{showCollection},
@@ -24,10 +24,10 @@
                                       where uid=#{uid};
     </update>
     <insert id="addSetting" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
-        insert into niftiihub.user_setting (uid, recognized)
+        insert into niftihub.user_setting (uid, recognized)
         values (#{uid},#{recognized});
     </insert>
     <select id="selectUserSetting" parameterType="int" resultType="com.example.niftihub.pojo.data.UserSettingDO">
-        select * from niftiihub.user_setting where uid=#{uid};
+        select * from niftihub.user_setting where uid=#{uid};
     </select>
 </mapper>

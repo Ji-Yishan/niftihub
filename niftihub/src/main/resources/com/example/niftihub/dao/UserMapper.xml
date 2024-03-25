@@ -5,23 +5,23 @@
 <mapper namespace="com.example.niftihub.dao.UserMapper">
     <!--    -->
     <insert id="addUser" parameterType="com.example.niftihub.pojo.data.UserDO">
-        insert into niftiihub.user_info (phone, password)
+        insert into niftihub.user_info (phone, password)
         values (#{phone},#{password});
     </insert>
 
     <select id="selectUserInfo" parameterType="int" resultType="com.example.niftihub.pojo.data.UserDO">
-        select * from niftiihub.user_info where uid=#{uid};
+        select * from niftihub.user_info where uid=#{uid};
     </select>
     <select id="selectUserInfoByPhone" parameterType="String" resultType="com.example.niftihub.pojo.data.UserDO">
-        select * from niftiihub.user_info where phone=#{phone};
+        select * from niftihub.user_info where phone=#{phone};
     </select>
     <select id="login" parameterType="String" resultType="com.example.niftihub.pojo.data.UserDO">
-        select * from niftiihub.user_info where phone=#{phone};
+        select * from niftihub.user_info where phone=#{phone};
     </select>
 
     <update id="updateUserInfo" parameterType="com.example.niftihub.pojo.data.UserDO">
 
-        update niftiihub.user_info
+        update niftihub.user_info
         <set>
             <if test="username != null">
                 username = #{username},
@@ -41,14 +41,14 @@
 
     </update>
     <delete id="deleteUser" parameterType="int">
-        delete from niftiihub.user_info where uid=#{uid} ;
+        delete from niftihub.user_info where uid=#{uid} ;
     </delete>
     <update id="updatePhone" parameterType="com.example.niftihub.pojo.data.UserDO">
-        update niftiihub.user_info set phone=#{phone}
+        update niftihub.user_info set phone=#{phone}
         where uid=#{uid};
     </update>
     <update id="updatePassword" parameterType="com.example.niftihub.pojo.data.UserDO">
-        update niftiihub.user_info set password=#{password}
+        update niftihub.user_info set password=#{password}
         where uid=#{uid};
     </update>
 

@@ -5,7 +5,7 @@
 <mapper namespace="com.example.niftihub.dao.DesignMapper">
     <update id="updateDesign" parameterType="com.example.niftihub.pojo.data.DesignDO">
 
-        update niftiihub.design
+        update niftihub.design
         <set>
             <if test="name != null">
                 `name` = #{name},
@@ -42,24 +42,24 @@
 
     </update>
     <insert id="addDesign" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
-        insert into niftiihub.design (uid, did,`name`,price,info,brand,pic,
+        insert into niftihub.design (uid, did,`name`,price,info,brand,pic,
                                       `time`,id,`describe`,`right`,amount)
         values (#{uid},#{did},#{name},#{price},#{info},#{brand},#{pic},
                 #{time},#{id},#{describe},#{right},#{amount});
     </insert>
     <select id="selectMyDesign" parameterType="int" resultType="com.example.niftihub.pojo.data.DesignDO">
-        select * from niftiihub.design where uid=#{uid};
+        select * from niftihub.design where uid=#{uid};
     </select>
     <select id="selectDesignById" parameterType="int" resultType="com.example.niftihub.pojo.data.DesignDO">
-        select * from niftiihub.design where did=#{did};
+        select * from niftihub.design where did=#{did};
     </select>
     <delete id="deleteDesign" parameterType="int">
-        delete from niftiihub.design where did=#{did} ;
+        delete from niftihub.design where did=#{did} ;
     </delete>
     <select id="selectDesignByname" parameterType="String" resultType="com.example.niftihub.pojo.data.DesignDO">
-        select * from niftiihub.design where name like #{did};
+        select * from niftihub.design where name like #{did};
     </select>
     <select id="selectAll" parameterType="String" resultType="com.example.niftihub.pojo.data.DesignDO">
-        select * from niftiihub.design ;
+        select * from niftihub.design ;
     </select>
 </mapper>

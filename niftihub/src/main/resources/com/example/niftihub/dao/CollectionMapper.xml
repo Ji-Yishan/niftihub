@@ -5,15 +5,15 @@
 <mapper namespace="com.example.niftihub.dao.CollectionMapper">
     <!--    -->
     <insert id="insertCollection" parameterType="com.example.niftihub.pojo.data.CollectionDO">
-        insert into niftiihub.collection (ownerId, did,sellerId)
+        insert into niftihub.collection (ownerId, did,sellerId)
         values (#{ownerId},#{did},#{sellerId});
     </insert>
 
     <select id="selectCollection" parameterType="int" resultType="com.example.niftihub.pojo.data.CollectionDO">
-        select * from niftiihub.collection where ownerId=#{ownerId};
+        select * from niftihub.collection where ownerId=#{ownerId};
     </select>
     <delete id="deleteCollection" parameterType="com.example.niftihub.pojo.data.CollectionDO">
-        delete from niftiihub.collection where ownerId=#{ownerId} and did={did} ;
+        delete from niftihub.collection where ownerId=#{ownerId} and did={did} ;
     </delete>
 
 

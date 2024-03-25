@@ -22,7 +22,10 @@ spring:
 
 niftihub:
   allow-url:
-    /register,/login,/test/**
+    /register,/login,/test/**,/admin/login
+  admin-url:
+    /admin
+
 
 #  data:
 #    redis:

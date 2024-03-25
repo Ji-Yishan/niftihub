@@ -1,7 +1,9 @@
 package com.example.niftihub;
 
+import com.example.niftihub.dao.AdminMapper;
 import com.example.niftihub.dao.UserMapper;
 import com.example.niftihub.pojo.data.UserDO;
+import com.example.niftihub.service.impl.AdminServiceImpl;
 import com.example.niftihub.service.inter.MessageService;
 import com.example.niftihub.service.inter.UserService;
 import com.example.niftihub.uitl.JwtUtils;
@@ -19,17 +21,15 @@ class niftihubApplicationTests {
     UserMapper userMapper;
     @Autowired
     MessageService messageService;
+    @Autowired
+    AdminServiceImpl adminService;
 
 
     @Test
     void contextLoads() {
-        UserDO userDO = new UserDO(12,"小明","1433223",null,null,"passwd");
-        String jwt =  JwtUtils.createToken(10*1000,userDO,"Admin");
-        System.out.println(JwtUtils.parseJWT(jwt));
 
-        //System.out.println(tokenFilter.matchUrl("/test/asdsasd/asd"));
-
-
+        String token =  JwtUtils.createUserToken("12345678910");
+        System.out.println(JwtUtils.getLevel(token));
     }
 
 }

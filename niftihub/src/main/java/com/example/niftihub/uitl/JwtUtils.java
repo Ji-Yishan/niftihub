@@ -4,6 +4,7 @@ import com.example.niftihub.pojo.data.UserDO;
 import com.example.niftihub.service.impl.UserServiceImpl;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.simpleframework.xml.Default;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,11 +37,12 @@ public class JwtUtils {
      * 使用Hs256算法  私匙使用用户密码
      *
      * @param ttlMillis jwt过期时间,单位：毫秒？
-     * @param user      登录成功的user对象
+     * @param uid      登录成功的user对象的uid
      * @param authorization 登录的身份认证，"user","admin",当为其他值时转化为："user"
+     * @param level 管理员等级，普通用户为0
      * @return
      */
-    public static String createToken(long ttlMillis, UserDO user,String authorization) {
+    public static String createToken(long ttlMillis, int uid,String authorization, int level) {
         if(!authorization.equals("admin")){
             authorization = "user";
         }
@@ -54,8 +56,9 @@ public class JwtUtils {
 
         //创建payload的私有声明（根据特定的业务需要添加，如果要拿这个做验证，一般是需要和jwt的接收方提前沟通好验证方式的）
         Map<String, Object> claims = new HashMap<String, Object>();
-        claims.put("uid", user.getUid());
+        claims.put("uid", uid);
         claims.put("Authorization", authorization);
+        claims.put("adminLevel", level);
         //claims.put("password", user.getPassword());
         //生成签名的时候使用的秘钥secret,这个方法本地封装了的，一般可以从本地配置文件中读取，切记这个秘钥不能外露哦。它就是你服务端的私钥，在任何场景都不应该流露出去。一旦客户端得知这个secret, 那就意味着客户端是可以自我签发jwt了。
 //        String key = user.getPassword();
@@ -83,13 +86,19 @@ public class JwtUtils {
     }
 
     /***
-     * 通过手机号返回一个JWT
+     * 通过手机号返回一个用户的JWT
      * @param phone
      * @return
      */
-    public static String createToken(String phone){
+    public static String createUserToken(String phone){
         UserDO userDO = userService.selectUserInfoByPhone(phone);
-        return createToken(24 * 60 * 60 * 1000,userDO,"user");
+        return createToken(24 * 60 * 60 * 1000,userDO.getUid(),"user",0);
+    }
+
+    public static String createAdminToken(int uid,int level){
+
+        return createToken(24 * 60 * 60 * 1000,uid,"admin",level);
+
     }
 
 
@@ -121,6 +130,10 @@ public class JwtUtils {
         return parseJWT(token).get("Authorization").toString();
     }
 
+    public static int getLevel(String token){
+        Claims claims = parseJWT(token);
+        return (int)claims.get("adminLevel");
+    }
 
     /**
      * 校验token
