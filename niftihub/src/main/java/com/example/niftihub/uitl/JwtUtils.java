@@ -147,13 +147,11 @@ public class JwtUtils {
 //        String key = user.getPassword();
         //Jwts.parser在执行parseClaimsJws(token)时如果token时间过期会抛出ExpiredJwtException异常
         try {
-            log.info("测试");
             //得到DefaultJwtParser
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(generateKey())
                     .build()
                     .parseClaimsJws(token).getBody();
-            log.info("claims:{}",claims);
             return true;
 
         }catch (ExpiredJwtException e){

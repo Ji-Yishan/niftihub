@@ -49,6 +49,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         if(token == null && matchUrl(request.getRequestURI(),allowUrls)){
             log.info("无需验证");
             filterChain.doFilter(request, response);
+            return;
         }
         //todo 这里可以判断用户的Authorization来决定接下来的操作
         JwtUtils.getAuthorization(token);
@@ -76,6 +77,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             writer.flush();
             return;
         }
+
         filterChain.doFilter(request, response);
     }
 
@@ -93,7 +95,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // 然后检查是否有通配符的情况
             if (allowUrl.endsWith("/**")) {
                 String pattern = allowUrl.substring(0, allowUrl.length() - 3);
-                return requestURI.startsWith(pattern);
+                if(requestURI.startsWith(pattern)){
+                    return true;
+                }
             }
         }
         // 如果以上条件都不满足，则不匹配

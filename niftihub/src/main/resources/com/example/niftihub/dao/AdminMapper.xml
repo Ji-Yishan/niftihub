@@ -8,12 +8,19 @@
 <!--        values (#{UID},#{fromUid},#{message},#{ifPrivate},#{targetUid},#{time});-->
 <!--    </insert>-->
 
-    <select id="login" parameterType="String" resultType="String">
-        SELECT `uid` FROM `admin` WHERE `username` = #{username} AND `password` = #{password};
+    <select id="login" parameterType="String" resultType="com.example.niftihub.pojo.dto.AdminDTO">
+        SELECT `uid`,`level` FROM `admin` WHERE `username` = #{username} AND `password` = #{password};
     </select>
     <select id="selectLevel" parameterType="String" resultType="Integer">
         SELECT `level` FROM `admin` WHERE `uid` = #{uid};
     </select>
+    <select id="selectUsername" parameterType="String" resultType="Integer">
+        SELECT `uid` FROM `admin` WHERE `username` = #{username};
+    </select>
+    <insert id="creatAdminUser" parameterType="com.example.niftihub.pojo.data.AdminDO">
+        INSERT INTO `niftihub`.`admin` (`username`, `password`, `level`, `createUser`)
+        VALUES (#{username}, #{password}, #{level}, #{createUser});
+    </insert>
 
 
 
