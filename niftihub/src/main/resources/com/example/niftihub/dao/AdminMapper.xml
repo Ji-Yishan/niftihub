@@ -9,7 +9,7 @@
 <!--    </insert>-->
 
     <select id="login" parameterType="String" resultType="com.example.niftihub.pojo.dto.AdminDTO">
-        SELECT `uid`,`level` FROM `admin` WHERE `username` = #{username} AND `password` = #{password};
+        SELECT `uid`,`level`,`isValid` FROM `admin` WHERE `username` = #{username} AND `password` = #{password};
     </select>
     <select id="selectLevel" parameterType="String" resultType="Integer">
         SELECT `level` FROM `admin` WHERE `uid` = #{uid};
@@ -18,10 +18,24 @@
         SELECT `uid` FROM `admin` WHERE `username` = #{username};
     </select>
     <insert id="creatAdminUser" parameterType="com.example.niftihub.pojo.data.AdminDO">
-        INSERT INTO `niftihub`.`admin` (`username`, `password`, `level`, `createUser`)
-        VALUES (#{username}, #{password}, #{level}, #{createUser});
+        INSERT INTO `niftihub`.`admin` (`username`, `password`, `level`, `createUser`, `isValid`)
+        VALUES (#{username}, #{password}, #{level}, #{createUser}, #{isValid});
     </insert>
 
 
+    <update id="updateValid" parameterType="com.example.niftihub.pojo.data.AdminDO">
+
+        UPDATE `niftihub`.`admin`
+
+        update niftihub.user_info
+        <set>
+            `isValid` = #{isValid}
+        </set>
+
+        <where >
+            uid=#{uid};
+        </where>
+
+    </update>
 
 </mapper>

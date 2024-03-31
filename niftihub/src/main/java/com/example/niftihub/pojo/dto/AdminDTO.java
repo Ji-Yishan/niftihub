@@ -11,4 +11,5 @@ public class AdminDTO {
     int uid;
     int level;
     String token;
+    Boolean isValid;
 }

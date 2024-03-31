@@ -9,14 +9,18 @@ import com.example.niftihub.config.WebSocketGetHttpSessionConfig;
 import com.example.niftihub.pojo.data.MessageDO;
 import com.example.niftihub.service.impl.GroupServiceImpl;
 import com.example.niftihub.service.impl.MessageServiceImpl;
+import com.example.niftihub.uitl.JwtUtils;
 import com.example.niftihub.ws.pojo.MessageError;
 import com.example.niftihub.ws.pojo.OnlineUsers;
 import com.example.niftihub.ws.pojo.SystemMessageType;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +37,7 @@ public class ChatEndpoint {
     private static RabbitMQSend rabbitMQSend;
     private static MessageServiceImpl messageService;
     private static GroupServiceImpl groupService;
+    private static final String tokenHeader = "Authorization";
 
     @Autowired
     public void setRabbitMQSend(RabbitMQSend rabbitMQSend){
@@ -54,12 +59,16 @@ public class ChatEndpoint {
      * @param config
      */
     @OnOpen
-    public void onOpen(Session session, EndpointConfig config){
+    public void onOpen(Session session, EndpointConfig config) throws IOException {
         this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         this.userUid = (String) this.httpSession.getAttribute("uid");
+
+
         if(userUid == null){
             log.info("userId == null");
             userUid = session.getId();
+
+            session.getBasicRemote().sendText("这里可能有问题，提醒一下zsk");
         }
         OnlineUsers.addUser(userUid,session);
 

@@ -32,11 +32,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public LoginDTO login(@RequestBody UserDO userDO){
+    public LoginDTO login(@RequestBody UserDO userDO, HttpSession session){
         int uid=userService.login(userDO);
 //        todo 换成真的token
         String token="temp token";
         LoginDTO loginDTO=new LoginDTO(token,uid);
+        session.setAttribute("uid",uid);
         return loginDTO;
     }
     @PutMapping("/{uid}/personal/info")

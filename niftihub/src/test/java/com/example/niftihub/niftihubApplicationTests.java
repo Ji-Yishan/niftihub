@@ -27,9 +27,9 @@ class niftihubApplicationTests {
 
     @Test
     void contextLoads() {
-
-        String token =  JwtUtils.createUserToken("12345678910");
-        System.out.println(JwtUtils.getLevel(token));
+        String username = "小明";
+        String password = "123456";
+        System.out.println(adminService.login(username, password));
     }
 
 }

@@ -13,5 +13,6 @@ public class AdminDO {
     String password;
     int level;
     int createUser;
+    Boolean isValid;
 
 }

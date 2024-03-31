@@ -6,6 +6,8 @@ import com.example.niftihub.service.inter.UserSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author: Isabella
  * @create: 2024-03-16 23:31
@@ -28,5 +30,10 @@ public class UserSettingServiceImpl implements UserSettingService {
     @Override
     public UserSettingDO selectUserSetting(int uid) {
         return userSettingMapper.selectUserSetting(uid);
+    }
+
+    @Override
+    public List<UserSettingDO> selectAllUser(int offset) {
+        return userSettingMapper.selectAllUser(offset);
     }
 }

@@ -20,7 +20,7 @@
 
     </update>
     <update id="reconizeUser" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
-        update niftiihub.user_setting set recognized=#{recognized}
+        update niftihub.user_setting set recognized=#{recognized}
                                       where uid=#{uid};
     </update>
     <insert id="addSetting" parameterType="com.example.niftihub.pojo.data.UserSettingDO">
@@ -29,5 +29,8 @@
     </insert>
     <select id="selectUserSetting" parameterType="int" resultType="com.example.niftihub.pojo.data.UserSettingDO">
         select * from niftihub.user_setting where uid=#{uid};
+    </select>
+    <select id="selectAllUser" parameterType="int" resultType="com.example.niftihub.pojo.data.UserSettingDO">
+        SELECT * FROM niftihub.user_setting ORDER BY `uid` LIMIT #{offset}, 5
     </select>
 </mapper>

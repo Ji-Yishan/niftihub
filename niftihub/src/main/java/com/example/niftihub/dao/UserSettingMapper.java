@@ -1,7 +1,10 @@
 package com.example.niftihub.dao;
 
 import com.example.niftihub.pojo.data.UserSettingDO;
+import com.example.niftihub.pojo.dto.UserSettingDTO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * @author: Isabella
@@ -13,4 +16,5 @@ public interface UserSettingMapper {
     int reconizeUser(UserSettingDO userSettingDO);
     int addSetting(UserSettingDO userSettingDO);
     UserSettingDO selectUserSetting(int uid);
+    List<UserSettingDO> selectAllUser(int offset);
 }
