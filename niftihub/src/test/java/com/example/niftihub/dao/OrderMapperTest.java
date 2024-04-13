@@ -1,10 +1,12 @@
 package com.example.niftihub.dao;
 
 import com.example.niftihub.pojo.data.OrderDO;
+import com.example.niftihub.service.inter.OrderService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,6 +17,8 @@ import java.util.List;
 public class OrderMapperTest {
     @Autowired
     OrderMapper orderMapper;
+    @Autowired
+    OrderService orderService;
     @Test
     public void addOrder(){
         OrderDO orderDO=new OrderDO(1,2,"2023-1-14",1,"id",0);
@@ -47,5 +51,12 @@ public class OrderMapperTest {
         for (OrderDO o:orderDOS){
             System.out.println(o);
         }
+    }
+    @Test
+    public void addOrders(){
+        String time=new Date().getTime()+"";
+        OrderDO orderDO=new OrderDO(1,1,1345,"aedg");
+        orderService.addOrder(orderDO);
+        System.out.println(orderService.selectOrderByTime(time,1,1).getOid());
     }
 }

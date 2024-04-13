@@ -40,4 +40,8 @@
         select * from niftihub.order where `oid`=#{oid};
     </select>
 
+    <select id="selectOrderByTime" parameterType="String" resultType="com.example.niftihub.pojo.data.OrderDO">
+        select * from niftihub.order where `time`=#{time} and sellerId=#{sellerId} and buyerId=#{buyerId};
+    </select>
+
 </mapper>

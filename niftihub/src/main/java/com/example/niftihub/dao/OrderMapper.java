@@ -2,6 +2,7 @@ package com.example.niftihub.dao;
 
 import com.example.niftihub.pojo.data.OrderDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface OrderMapper {
     int updateOrder(OrderDO orderDO);
     int deleteOrder(int oid);
     OrderDO selectOrderById(int oid);
+    OrderDO selectOrderByTime(@Param("time") String time,
+                              @Param("sellerId") int sellerId,@Param("buyerId") int buyerId);
 }

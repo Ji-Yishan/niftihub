@@ -15,4 +15,5 @@ public interface OrderService {
     int updateOrder(OrderDO orderDO);
     int deleteOrder(int oid);
     OrderDO selectOrderById(int oid);
+    OrderDO selectOrderByTime(String time,int sellerId,int buyerId);
 }

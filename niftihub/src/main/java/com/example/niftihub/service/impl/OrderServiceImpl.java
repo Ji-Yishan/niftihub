@@ -6,6 +6,8 @@ import com.example.niftihub.service.inter.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,11 +32,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public int addOrder(OrderDO orderDO) {
+
         return orderMapper.addOrder(orderDO);
     }
 
     @Override
     public int updateOrder(OrderDO orderDO) {
+        long date=new Date().getTime();
+        orderDO.setTime(date+"");
         return orderMapper.updateOrder(orderDO);
     }
 
@@ -46,5 +51,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDO selectOrderById(int oid) {
         return orderMapper.selectOrderById(oid);
+    }
+
+    @Override
+    public OrderDO selectOrderByTime(String time,int sellerId,int buyerId) {
+        return orderMapper.selectOrderByTime(time,sellerId,buyerId);
     }
 }

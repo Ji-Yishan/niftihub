@@ -29,7 +29,14 @@ public class OrderDO {
         this.status = status;
     }
 
-    public OrderDO(String time, int status,int oid) {
+    public OrderDO(int sellerId, int buyerId, int did, String id) {
+        this.sellerId = sellerId;
+        this.buyerId = buyerId;
+        this.did = did;
+        this.id = id;
+    }
+
+    public OrderDO(String time, int status, int oid) {
         this.time = time;
         this.status = status;
         this.oid=oid;
